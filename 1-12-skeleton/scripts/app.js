@@ -3,6 +3,23 @@
   'use strict';
 
   var weatherAPIUrlBase = 'http://127.0.0.1:9800';
+  var idb, dbObject, transaction, objectStore, request;
+
+  idb = indexedDB.open('forecasts');
+  idb.onsuccess = function (evt) {
+    dbObject = evt.target.result;
+    console.log('onSuccessSecond!');
+  }
+
+  idb.onupgradeneeded = function (evt) {
+    if (evt.oldVersion < 1) {
+      if (!dbObject) {
+        console.log('onUpgradeFirst!');
+        dbObject = evt.target.result;
+      }
+      dbObject.createObjectStore('cities', { autoIncrement: true });
+    }
+  }
 
   var app = {
     isLoading: true,
@@ -42,6 +59,19 @@
     app.getForecast(key, label);
     app.selectedCities.push({ key: key, label: label });
     app.toggleAddDialog(false);
+    transaction = dbObject.transaction(['cities'], 'readwrite');
+    objectStore = transaction.objectStore('cities');
+    var cityToBeAdded = { key, label };
+    // Save the entry object
+    request = objectStore.getAll();
+    request.onsuccess = function (resp) {
+      if (resp.target.result.indexOf(cityToBeAdded) === -1) {
+        objectStore.add(cityToBeAdded);
+      }
+    }
+    request.onerror = function (err) {
+      console.log(err);
+    }
   });
 
   /* Event listener for cancel button in add city dialog */
