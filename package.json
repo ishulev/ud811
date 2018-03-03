@@ -1,0 +1,23 @@
+{
+  "name": "ud811",
+  "version": "1.0.0",
+  "description": "These are the course materials for UD811.",
+  "main": "forecast-io_proxy.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ishulev/ud811.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ishulev/ud811/issues"
+  },
+  "homepage": "https://github.com/ishulev/ud811#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-serve": "^1.4.0"
+  }
+}

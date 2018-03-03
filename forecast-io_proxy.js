@@ -4,7 +4,7 @@ var http = require('http');
 var https = require('https');
 
 var port = 9800;
-var forecastIOKey = 'PUT_FORECAST_IO_API_KEY_HERE';
+var forecastIOKey = '6b43e43626a3b9ec2c18065cf64109ee';
 var cachedForecasts = {};
 
 var cityToLatLon = {
@@ -26,7 +26,7 @@ var cityToLatLon = {
 
 function handleRequest(request, response) {
   response.setHeader('Access-Control-Allow-Origin', '*');
-  var cityName = request.url.substring(1).replace('.json', '');
+  var cityName = request.url.substring(1).replace('.json', '').replace('?', '');
   var cityCoords = cityToLatLon[cityName];
   if (!cityCoords) {
     response.statusCode = 404;
@@ -42,12 +42,12 @@ function handleRequest(request, response) {
     response.end(JSON.stringify(cachedForecast));
     console.log('RESP ', cityName, '[cache]');
   } else {
-    getForecast(cityCoords, function(freshForecast) {
+    getForecast(cityCoords, function (freshForecast) {
       response.end(freshForecast);
       var forecast = JSON.parse(freshForecast);
       forecast.expiresAt = Date.now() + (1000 * 60);
-      cachedForecasts[cityName] = forecast; 
-      console.log('RESP ', cityName, '[network]');     
+      cachedForecasts[cityName] = forecast;
+      console.log('RESP ', cityName, '[network]');
     });
   }
 }
@@ -57,12 +57,12 @@ function getForecast(coords, callback) {
     host: 'api.forecast.io',
     path: '/forecast/' + forecastIOKey + '/' + coords
   };
-  https.request(options, function(response) {
+  https.request(options, function (response) {
     var resp = '';
-    response.on('data', function(chunk) {
+    response.on('data', function (chunk) {
       resp += chunk;
     });
-    response.on('end', function() {
+    response.on('end', function () {
       if (callback) {
         callback(resp);
       }
@@ -72,6 +72,6 @@ function getForecast(coords, callback) {
 
 var httpServer = http.createServer(handleRequest);
 
-httpServer.listen(port, function() {
+httpServer.listen(port, function () {
   console.log('Forecast.io proxy server started...', port);
 });
