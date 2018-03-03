@@ -8,13 +8,18 @@
   idb = indexedDB.open('forecasts');
   idb.onsuccess = function (evt) {
     dbObject = evt.target.result;
-    console.log('onSuccessSecond!');
+    transaction = dbObject.transaction(['cities'], 'readonly');
+    objectStore = transaction.objectStore('cities');
+    request = objectStore.getAll();
+    request.onsuccess = function (resp) {
+      resp.target.result.forEach(city => app.getForecast(city.key, city.label))
+    }
   }
 
   idb.onupgradeneeded = function (evt) {
     if (evt.oldVersion < 1) {
       if (!dbObject) {
-        console.log('onUpgradeFirst!');
+        // console.log('onUpgradeFirst!');
         dbObject = evt.target.result;
       }
       dbObject.createObjectStore('cities', { autoIncrement: true });
@@ -65,7 +70,7 @@
     // Save the entry object
     request = objectStore.getAll();
     request.onsuccess = function (resp) {
-      if (resp.target.result.indexOf(cityToBeAdded) === -1) {
+      if (!resp.target.result.some(city => city.label === cityToBeAdded.label)) {
         objectStore.add(cityToBeAdded);
       }
     }
