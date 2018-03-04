@@ -1,4 +1,5 @@
-var cacheName = 'weatherPWA';
+var shellCache = 'weatherShellCache';
+var apiCache = 'weatherApiCache';
 var filesToCache = [
   '/',
   '/scripts/app.js',
@@ -22,7 +23,7 @@ var filesToCache = [
 
 self.addEventListener('install', function(e) {
   e.waitUntil(
-    caches.open(cacheName).then(function(cache){
+    caches.open(shellCache).then(function(cache){
       console.log(cache);
       return cache.addAll(filesToCache);
     })
@@ -33,8 +34,7 @@ self.addEventListener('activate', function(e) {
   e.waitUntil(
     caches.keys().then(function(keylist) {
       return Promise.all(keylist.map(function(key) {
-        console.log(keylist);
-        if(key !== cacheName && key !== dataCacheName) {
+        if(key !== shellCache && key !== apiCache) {
           return caches.delete(key);
         }
       }))
@@ -44,9 +44,22 @@ self.addEventListener('activate', function(e) {
 
 self.addEventListener('fetch', function(e) {
   console.log('[ServiceWorker] fetch', e.request.url);
-  e.respondWith(
-    caches.match(e.request).then(function(response) {
-      return response || fetch(e.request);
-    })
-  );
+  if(e.request.url.startsWith('http://127.0.0.1:9800')) {
+    e.respondWith(
+      fetch(e.request).then(response => {
+        return caches.open(apiCache).then(cache => {
+          cache.put(e.request.url, response.clone());
+          console.log('[Service Worker] fetched and cached');
+          return response;
+        })
+      })
+    );
+  }
+  else {
+    e.respondWith(
+      caches.match(e.request).then(function(response) {
+        return response || fetch(e.request);
+      })
+    );
+  }
 });
