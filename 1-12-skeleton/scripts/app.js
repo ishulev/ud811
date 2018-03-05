@@ -160,12 +160,12 @@
 
   // Gets a forecast for a specific city and update the card with the data
   app.getForecast = function (key, label) {
-    var url = weatherAPIUrlBase + '?' + key;
-    if('caches' in window) {
+    var url = weatherAPIUrlBase + '/' + key;
+    if ('caches' in window) {
       caches.match(url).then(response => {
-        if(response) {
+        if (response) {
           response.json().then(json => {
-            app.updateForecastCard(Object.assign(json,{key, label}));
+            app.updateForecastCard(Object.assign(json, { key, label }));
           })
         }
       })
@@ -195,9 +195,9 @@
     });
   };
 
-  if('serviceWorker' in navigator) {
+  if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./service-worker.js')
-      .then(function(register) {
+      .then(function (register) {
         console.log('register', register);
       })
   }

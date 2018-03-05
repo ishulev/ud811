@@ -26,7 +26,7 @@ var cityToLatLon = {
 
 function handleRequest(request, response) {
   response.setHeader('Access-Control-Allow-Origin', '*');
-  var cityName = request.url.substring(1).replace('.json', '').replace('?', '');
+  var cityName = request.url.substring(1);
   var cityCoords = cityToLatLon[cityName];
   if (!cityCoords) {
     response.statusCode = 404;

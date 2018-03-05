@@ -21,20 +21,17 @@ var filesToCache = [
   '/images/wind.png'
 ];
 
-self.addEventListener('install', function(e) {
+self.addEventListener('install', function (e) {
   e.waitUntil(
-    caches.open(shellCache).then(function(cache){
-      console.log(cache);
-      return cache.addAll(filesToCache);
-    })
+    caches.open(shellCache).then(cache => cache.addAll(filesToCache))
   );
 });
 
-self.addEventListener('activate', function(e) {
+self.addEventListener('activate', function (e) {
   e.waitUntil(
-    caches.keys().then(function(keylist) {
-      return Promise.all(keylist.map(function(key) {
-        if(key !== shellCache && key !== apiCache) {
+    caches.keys().then(keylist => {
+      Promise.all(keylist.map(function (key) {
+        if (key !== shellCache && key !== apiCache) {
           return caches.delete(key);
         }
       }))
@@ -42,9 +39,9 @@ self.addEventListener('activate', function(e) {
   );
 });
 
-self.addEventListener('fetch', function(e) {
+self.addEventListener('fetch', function (e) {
   console.log('[ServiceWorker] fetch', e.request.url);
-  if(e.request.url.startsWith('http://127.0.0.1:9800')) {
+  if (e.request.url.startsWith('http://127.0.0.1:9800')) {
     e.respondWith(
       fetch(e.request).then(response => {
         return caches.open(apiCache).then(cache => {
@@ -57,7 +54,7 @@ self.addEventListener('fetch', function(e) {
   }
   else {
     e.respondWith(
-      caches.match(e.request).then(function(response) {
+      caches.match(e.request).then(function (response) {
         return response || fetch(e.request);
       })
     );
