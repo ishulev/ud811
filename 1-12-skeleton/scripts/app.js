@@ -161,12 +161,15 @@
   // Gets a forecast for a specific city and update the card with the data
   app.getForecast = function (key, label) {
     var url = weatherAPIUrlBase + '/' + key;
+    var serverIsBack = false;
     if ('caches' in window) {
       caches.match(url).then(response => {
         if (response) {
           response.json().then(json => {
-            app.updateForecastCard(Object.assign(json, { key, label }));
-          })
+            if (!serverIsBack) {
+              app.updateForecastCard(Object.assign(json, { key, label }));
+            }
+          });
         }
       })
     }
@@ -175,15 +178,14 @@
     request.onreadystatechange = function () {
       if (request.readyState === XMLHttpRequest.DONE) {
         if (request.status === 200) {
-          var response = JSON.parse(request.response);
-          response.key = key;
-          response.label = label;
-          app.updateForecastCard(response);
+          serverIsBack = true;
+          app.updateForecastCard(Object.assign(JSON.parse(request.response), { key, label }));
         }
       }
     };
     request.open('GET', url);
     request.send();
+    // Promise.all(promises).then(response => console.log(response));
     // fetch(url).then(response => response.json()).then(data => app.updateForecastCard(Object.assign(data, {key, label})))
   };
 

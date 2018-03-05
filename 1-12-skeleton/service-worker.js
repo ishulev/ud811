@@ -46,7 +46,7 @@ self.addEventListener('fetch', function (e) {
       fetch(e.request).then(response => {
         return caches.open(apiCache).then(cache => {
           cache.put(e.request.url, response.clone());
-          console.log('[Service Worker] fetched and cached');
+          console.log('[Service Worker] fetched and cached ' + e.request.url);
           return response;
         })
       })
