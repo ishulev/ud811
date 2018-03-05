@@ -18,6 +18,7 @@
   "homepage": "https://github.com/ishulev/ud811#readme",
   "devDependencies": {
     "gulp": "^3.9.1",
-    "gulp-serve": "^1.4.0"
+    "gulp-serve": "^1.4.0",
+    "sw-precache": "^5.2.1"
   }
 }

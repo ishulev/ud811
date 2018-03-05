@@ -198,10 +198,23 @@
   };
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js')
-      .then(function (register) {
-        console.log('register', register);
+    // navigator.serviceWorker.register('./service-worker.js')
+    //   .then(function (register) {
+    //     console.log('register', register);
+    //   })
+    navigator.serviceWorker.getRegistrations().then(function (registrations) {
+      registrations.forEach(reg => {
+        if (reg.active.scriptURL.endsWith('service-worker.js')) {
+          reg.unregister();
+        }
       })
+      if (!registrations.some(reg => reg.active.scriptURL.endsWith('generated-sw.js'))) {
+        navigator.serviceWorker.register('./generated-sw.js')
+          .then(function (register) {
+            console.log('register', register);
+          })
+      }
+    });
   }
 
 })();
